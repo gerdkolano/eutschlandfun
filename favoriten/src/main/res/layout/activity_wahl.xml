@@ -1,0 +1,168 @@
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="vertical"
+  tools:context="net.za.dyndns.gerd.deutschlandfunk.favoriten.WahlActivity">
+
+  <ScrollView
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="4"
+    >
+
+    <LinearLayout
+      android:id="@+id/welcheSerie"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      >
+    </LinearLayout>
+  </ScrollView>
+
+  <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <Button
+      android:id="@+id/dialogEditButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:orientation="horizontal"
+      android:text="@string/benutzeredit"
+      />
+
+    <Button
+      android:id="@+id/dialogInfoButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:orientation="horizontal"
+      android:text="@string/benutzerinfo"
+      />
+
+    <Button
+      android:id="@+id/dialogFrageButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:orientation="horizontal"
+      android:text="@string/benutzerfrage"
+      />
+  </LinearLayout>
+
+  <!--
+      <EditText
+          android:id="@+id/txt_your_name"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:inputType="text"
+          android:imeOptions="actionDone"
+        />
+
+    <EditText
+      android:id="@+id/editText"
+      android:layout_width="match_parent"
+      android:inputType="text"
+      android:layout_height="wrap_content"/>
+  -->
+
+  <Button
+    android:id="@+id/testTaste1"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:text="testTaste1 noch ohne Funktion"
+    />
+
+  <Button
+    android:id="@+id/testTaste2"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:text="testTaste2 noch ohne Funktion"
+    />
+
+  <SeekBar
+    android:id="@+id/SeekBar01"
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    />
+
+  <TextView
+    android:id="@+id/fortschritt"
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:text="Fortschritt"
+    />
+
+  <ScrollView
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="4"
+    >
+
+    <LinearLayout
+      android:id="@+id/welcherTag"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      >
+    </LinearLayout>
+  </ScrollView>
+
+</LinearLayout>
+  <!--
+  Vorher ohne Scroll:
+
+    <LinearLayout
+      android:id="@+id/welcherTag"
+      android:layout_width="fill_parent"
+      android:layout_height="0dp"
+      android:layout_weight="3"
+      android:orientation="vertical"
+      >
+    </LinearLayout>
+
+  Nachher mit Scroll:
+
+    <ScrollView
+      android:layout_width="fill_parent"
+      android:layout_height="0dp"
+      android:layout_weight="3"
+      >
+
+      <LinearLayout
+        android:id="@+id/welcherTag"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+      </LinearLayout>
+    </ScrollView>
+
+    -->
+
+  <!--
+  <TextView
+    android:id="@+id/textView1"
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="3"
+    android:text="@string/serie"
+    />
+
+  <TextView
+    android:id="@+id/textView2"
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:text="@string/tage"
+    />
+
+  -->
