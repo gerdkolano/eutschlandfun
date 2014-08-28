@@ -1,4 +1,4 @@
 eutschlandfun
 =============
 
-Deutschlandfunk - Favoriten wie "Forschung aktuell" oder "Wissenschaft im Brennpunkt"
+Deutschlandfunk - Lade Favoriten wie "Forschung aktuell" oder "Wissenschaft im Brennpunkt" herunter und höre sie
