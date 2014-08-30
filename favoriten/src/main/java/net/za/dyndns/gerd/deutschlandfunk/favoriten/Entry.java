@@ -51,7 +51,9 @@ public class Entry implements Comparable<Entry> { // benötigt compareTo(Entry e
   @Override
   public int compareTo(Entry entry) {  // für "implements Comparable<Entry>"
     //return this.link.compareTo(entry.link);
-    return entry.link.compareTo(this.link);
+    int lastCmp = entry.zeitstempel.compareTo(this.zeitstempel);
+    return (lastCmp != 0 ? lastCmp : entry.link.compareTo(this.link));
+    //return entry.link.compareTo(this.link);
   }
 
   public void setTaste(Button taste) {
@@ -110,6 +112,40 @@ public class Entry implements Comparable<Entry> { // benötigt compareTo(Entry e
         this.duration
     );
     return erg;
+  }
+
+  public boolean allesGesammelt(String strLine, int zeile) {
+    switch (zeile % siebenZeilen) {
+      case 0:
+        title = strLine;
+        return false;
+      case 1:
+        autor = strLine;
+        return false;
+      case 2:
+        try {
+          seitenanzahl = Integer.parseInt(strLine);
+        } catch (NumberFormatException e) {
+          seitenanzahl = 0;
+        }
+        return false;
+      case 3:
+        try {
+          seitennummer = Integer.parseInt(strLine);
+        } catch (NumberFormatException e) {
+          seitennummer = 0;
+        }
+        return false;
+      case 4:
+        zeitstempel = strLine;
+        return false;
+      case 5:
+        link = strLine;
+        return false;
+      case 6:
+        duration = strLine;
+      default:return true;
+    }
   }
 
   public void ladeNach(String strLine, int zeile) {

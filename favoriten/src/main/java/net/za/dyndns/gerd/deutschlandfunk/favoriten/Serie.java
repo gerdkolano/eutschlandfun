@@ -4,9 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 /**
- * Created by hanno on 06.06.14.
+ * Created by hanno on 2014-08-29 18:32.
  */
-public class Serie {
+public class Serie  implements Comparable<Serie> {
   private String menschenlesbarerName;
   private String suchbegriff;
 
@@ -28,10 +28,10 @@ public class Serie {
     suchbegriff = "searchterm=" + suchbegriff;
   }
 
-  public boolean allesGesammelt(String wort, int zeile) {
+  public boolean allesGesammelt(String strLine, int zeile) {
     switch (zeile % 2) {
-      case 0:menschenlesbarerName = wort; return false;
-      case 1:suchbegriff = wort; return true;
+      case 0:menschenlesbarerName = strLine; return false;
+      case 1:suchbegriff = strLine; return true;
       default:return true;
     }
   }
@@ -54,4 +54,8 @@ public class Serie {
   }
 
 
+  @Override
+  public int compareTo(Serie serie) {
+    return menschenlesbarerName.compareToIgnoreCase(serie.getMenschenlesbarerName());
+  }
 }

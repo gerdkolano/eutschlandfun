@@ -3,7 +3,6 @@ package net.za.dyndns.gerd.deutschlandfunk.favoriten;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -13,26 +12,23 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.concurrent.ExecutionException;
 
 import static android.view.View.*;
 
-public class WahlActivity
+/* Erprobe git 2014-08-28
+*
+*   pushd /zoe-home/zoe-hanno/android/Deutschlandfunk
+*   git commit
+*   git push -u origin master
+*/
+public class
+    WahlActivity
     extends ActionBarActivity
     implements BenutzerEdit.EditNameDialogListener {
   private int debug;
@@ -40,7 +36,7 @@ public class WahlActivity
   private static boolean wifiConnected = false;
   // Whether there is a mobile connection.
   private static boolean mobileConnected = false;
-  private int seitennummer;
+  private int prefSeite;
   private int seitenanzahl;
   private String suchbegriff;
   private MediaPlayer mediaPlayer;
@@ -51,11 +47,10 @@ public class WahlActivity
   private Button dialogFrageButton;
   private FragmentManager fm = getFragmentManager();
 
-
   public WahlActivity() {
     seitenanzahl = 1;
-    seitennummer = 3;
-    debug = 0; // debug=1 macht die Bedienelemente etwas schwatzhafter
+    prefSeite = 3;
+    debug = 1; // debug=1 macht die Bedienelemente etwas schwatzhafter
     debugSchranke = -1;
   }
 
@@ -76,7 +71,7 @@ public class WahlActivity
     if (debug > 0) Log.i("W---", "+++++++++++++++++++++");
     if (debug > 0) Log.i("W005", "onRestart DLF");
 
-    //loadPage(suchbegriff, seitennummer);
+    //loadPage(suchbegriff, prefSeite);
   }
 
   // Refreshes the display if the network connection and the
@@ -84,7 +79,7 @@ public class WahlActivity
   @Override
   public void onStart() {
     super.onStart();
-    
+
     //showEditDialog();
 
     // Gets the user's network preference settings
@@ -92,23 +87,24 @@ public class WahlActivity
 
     if (debug > 0) Log.i("W010", "onStart DLF is about to become visible");
     // Teste mal edit und commit
-    SharedPreferences.Editor editor = mySharedPrefs.edit();
-    editor.putString("seitennummerPref", "2");
-    //editor.putString("sendungsnamePreff", "kultur");
-    if (editor.commit()) {
-      if (debug > 8) Log.i("W011", "gut");
-    } else {
-      if (debug > 8) Log.i("W011", "schlecht");
-    }
-
-    String nummertext = mySharedPrefs.getString("seitennummerPref", "1");
-    try {
-      this.seitennummer = Integer.parseInt(nummertext);
-      if (debug > 8) Log.i("W013", "nummertext = " + nummertext);
-    } catch (NumberFormatException e) {
-      //Will Throw exception!
-      //do something! anything to handle the exception.
-      if (debug > 8) Log.i("WE13", nummertext + "!" + e.toString());
+    if (false) {
+      SharedPreferences.Editor editor = mySharedPrefs.edit();
+      editor.putString("seitennummerPref", "2");
+      //editor.putString("sendungsnamePreff", "kultur");
+      if (editor.commit()) {
+        if (debug > 8) Log.i("W011", "gut");
+      } else {
+        if (debug > 8) Log.i("W011", "schlecht");
+      }
+      String nummertext = mySharedPrefs.getString("seitennummerPref", "1");
+      try {
+        this.prefSeite = Integer.parseInt(nummertext);
+        if (debug > 8) Log.i("W013", "nummertext = " + nummertext);
+      } catch (NumberFormatException e) {
+        //Will Throw exception!
+        //do something! anything to handle the exception.
+        if (debug > 8) Log.i("WE13", nummertext + "!" + e.toString());
+      }
     }
 
     String nochEineSerie = mySharedPrefs.getString("nochEineSeriePref", "mySharedPrefs liefert nichts");
@@ -279,11 +275,11 @@ public class WahlActivity
         stelleSerienauswahlbuttonsHer(); // loadPage();
         return true;
       case R.id.vorigeSeite:
-        this.seitennummer = ((this.seitennummer > 1) ? --this.seitennummer : this.seitenanzahl);
+        this.prefSeite = ((this.prefSeite > 1) ? --this.prefSeite : this.seitenanzahl);
         stelleSerienauswahlbuttonsHer(); // loadPage();
         return true;
       case R.id.nächsteSeite:
-        this.seitennummer++;
+        this.prefSeite++;
         stelleSerienauswahlbuttonsHer(); // loadPage();
         return true;
       case R.id.seitennummer:
@@ -337,8 +333,8 @@ public class WahlActivity
     suchbegriff = serie.getSuchbegriff();
     Toast.makeText(this, "WahlActivity.onFinishEditDialog: "
         + suchbegriff, Toast.LENGTH_SHORT).show();
-    if(debug>debugSchranke) Log.i("W035","suchbegriff=\"" + suchbegriff + "\"");
-    if ( ! suchbegriff.equals("")) {
+    if (debug > debugSchranke) Log.i("W035", "suchbegriff=\"" + suchbegriff + "\"");
+    if (!suchbegriff.equals("")) {
       // Anzeigen der Buttons zum Abspielen je einer der Sendungen,
       // die zu diesem Suchhbegriff gefunden werden.
       Serien serien;
@@ -353,11 +349,11 @@ public class WahlActivity
   }
 
   public void doPositiverKlick() {
-    if(debug>debugSchranke) Log.i("W040", "doPositiverKlick");
+    if (debug > debugSchranke) Log.i("W040", "doPositiverKlick");
   }
 
   public void doNegativerKlick() {
-    if(debug>debugSchranke) Log.i("W040", "doNegativerKlick");
+    if (debug > debugSchranke) Log.i("W040", "doNegativerKlick");
   }
 
 /*

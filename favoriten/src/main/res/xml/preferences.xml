@@ -34,12 +34,14 @@
   <EditTextPreference
     android:defaultValue="1"
     android:key="seitennummerPref"
-    android:summary="Wähle die Nummer der abzuholende Seite. Je höher die Nummer, desto älter sind die Sendungen"
+    android:summary="Wähle die Nummer der abzuholende Seite.
+    Nummer 0 bedeutet \'Hole alle Seiten.\'.
+    Je höher die Nummer, desto älter sind die Sendungen"
     android:title="Seitennummer" />
   <EditTextPreference
     android:defaultValue="9"
     android:key="debugPref"
-    android:summary="Wähle das Debug-Niveau. Je höher das Niveau, desto ausfühlicher sind die Meldungen"
+    android:summary="Wähle das Debug-Niveau. Je höher das Niveau, desto ausführlicher sind die Meldungen"
     android:title="Debug" />
   <EditTextPreference
     android:defaultValue=""

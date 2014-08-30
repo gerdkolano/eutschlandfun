@@ -45,6 +45,7 @@ public class DownloadDlfunk extends AsyncTask<String, Integer, File>
   private final Handler handler;
   private Runnable wiederkehrend;
   private int debug;
+  private int debugSchranke=8;
   private String zieldateiname;
   private final int LADE = 2222;
   private final int SPIELE = 3333;
@@ -62,7 +63,11 @@ public class DownloadDlfunk extends AsyncTask<String, Integer, File>
     handler = new Handler();
     wiederkehrend = null;
     zieldateiname = "";
+    /*
     ladeOderSpielFortschritt = (TextView) this.activity.findViewById(R.id.fortschritt);
+    if (debug>debugSchranke) Log.i("F 01",
+        String.format( "fortschritt=%s", ladeOderSpielFortschritt.toString()));
+*/
   }
 
   public MediaPlayer getMediaPlayer() {
@@ -140,31 +145,57 @@ public class DownloadDlfunk extends AsyncTask<String, Integer, File>
   @Override
   protected void onProgressUpdate(Integer... publishedProgress) {
     // publishProgress liefert das hier verwendete Array publishedProgress
+    seekBar = (SeekBar) this.activity.findViewById(R.id.SeekBar01);
+    ladeOderSpielFortschritt = (TextView) this.activity.findViewById(R.id.fortschritt);
     int art = publishedProgress[0];
+    String meldung = "";
     switch (art) {
       case LADE:
-        ladeOderSpielFortschritt.setText(String.format("%02d%% mp3-Ladefortschritt %d von %d",
-            publishedProgress[1], publishedProgress[2], publishedProgress[3]));
+        seekBar.setProgress(publishedProgress[2]);
+        seekBar.setMax(publishedProgress[3]); // max wird in "onPrepared(" gesetzt.
+        meldung = String.format("%02d%% mp3-Ladefortschritt %d von %d",
+            publishedProgress[1], publishedProgress[2], publishedProgress[3]);
         break;
       case SPIELE:
+        final MediaPlayer fabspieler = mediaPlayer;
+      seekBar.setOnTouchListener(new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+          // This is event handler thumb moving event
+          //seekChange(v);
+          if (fabspieler.isPlaying()) {
+            SeekBar seekBar = (SeekBar) v;
+            if (debug>debugSchranke) Log.i("F080", seekBar.toString());
+            fabspieler.seekTo(seekBar.getProgress());
+          }
+          if (debug>debugSchranke) Log.i("F070", event.toString());
+          return false;
+        }
+      });
         int msek = publishedProgress[1];
         int max = publishedProgress[2];
         int jetzt = mediaPlayer.getCurrentPosition();
-        if (debug>9) Log.i("F 00", " CurPos=" + jetzt + " Update  =" + msek);
+        if (debug>99) Log.i("F 02",
+            String.format( "fortschritt=%s", ladeOderSpielFortschritt.toString()));
+        if (debug>debugSchranke) Log.i("F 03",
+            String.format( "CurPos=%d Update  =%d Max=%d", jetzt, msek, seekBar.getMax()));
         double prozentsatz = 100.0 * jetzt / max;
-        seekBar.setProgress(jetzt); // max wird in "onPrepared(" gesetzt.
-        ladeOderSpielFortschritt.setText(String.format(
+        seekBar.setMax(max); // max wird in "onPrepared(" gesetzt.
+        seekBar.setProgress(jetzt);
+        meldung = String.format(
             "%04.1f%% schon %s noch %s von %s - %s mp3-Abspielfortschritt",
             prozentsatz,
             hms(msek),
             hms(max - msek),
             hms(max),
             zieldateiname
-            ));
+            );
         break;
       default:
         break;
     }
+    if (debug>99) Log.i("F 04", meldung);
+    ladeOderSpielFortschritt.setText(meldung);
   }
 
   /**
@@ -176,9 +207,8 @@ public class DownloadDlfunk extends AsyncTask<String, Integer, File>
     fabspieler.start();
     boolean isPaused = !fabspieler.isPlaying();
     seekBar = (SeekBar) this.activity.findViewById(R.id.SeekBar01);
-    //
-    // ladeOderSpielFortschritt = (TextView) this.activity.findViewById(R.id.fortschritt);
-    if (debug>8) Log.i("F030", seekBar.toString());
+    ladeOderSpielFortschritt = (TextView) this.activity.findViewById(R.id.fortschritt);
+    if (debug>debugSchranke) Log.i("F030", seekBar.toString());
     if (fabspieler != null) {
       final int dauer = fabspieler.getDuration();
       final int divisor = fabspieler.getDuration() / 100;
@@ -195,7 +225,7 @@ public class DownloadDlfunk extends AsyncTask<String, Integer, File>
           @Override
           public void run() {
             int jetzt = fabspieler.getCurrentPosition();
-            if (debug>9) Log.i("F 50", " CurPos=" + jetzt
+            if (debug>99) Log.i("F 50", " CurPos=" + jetzt
                 + " Progress=" + seekBar.getProgress()
                 + " Max=" + seekBar.getMax());
             if (variante1) {
@@ -208,7 +238,7 @@ public class DownloadDlfunk extends AsyncTask<String, Integer, File>
           }
         };
         handler.post(wiederkehrend);
-        if (debug>8) Log.i("F060", "Progress-Takt " + (deltaMillisekunden / 1000) + " Sekunden");
+        if (debug>debugSchranke) Log.i("F060", "Progress-Takt " + (deltaMillisekunden / 1000) + " Sekunden");
       }
 
       seekBar.setOnTouchListener(new View.OnTouchListener() {
@@ -218,10 +248,10 @@ public class DownloadDlfunk extends AsyncTask<String, Integer, File>
           //seekChange(v);
           if (fabspieler.isPlaying()) {
             SeekBar seekBar = (SeekBar) v;
-            if (debug>8) Log.i("F080", seekBar.toString());
+            if (debug>debugSchranke) Log.i("F080", seekBar.toString());
             fabspieler.seekTo(seekBar.getProgress());
           }
-          if (debug>8) Log.i("F070", event.toString());
+          if (debug>debugSchranke) Log.i("F070", event.toString());
           return false;
         }
       });

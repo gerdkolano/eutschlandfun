@@ -2,8 +2,10 @@ package net.za.dyndns.gerd.deutschlandfunk.favoriten;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +48,6 @@ class DownloadXmlTask extends AsyncTask<String, String, Menge> {
   Context context;
   int debug;
   DownloadDlfunk downloadDlfunk;
-  int seitennummer;
   private Menge allentries;
   private MediaPlayer mediaPlayer;
   private TextView ladeFortschritt;
@@ -56,14 +57,13 @@ class DownloadXmlTask extends AsyncTask<String, String, Menge> {
   }
 
   /*
-  * gerufen als .execute() von
+  * gerufen als .execute() von Serien
   */
   DownloadXmlTask(Activity activity, Context context, int debug,
-                  int seitennummer, DownloadDlfunk downloadDlfunk, MediaPlayer mediaPlayer) {
+                  DownloadDlfunk downloadDlfunk, MediaPlayer mediaPlayer) {
     this.activity = activity;
     this.context = context;
     this.debug = debug;
-    this.seitennummer = seitennummer;
     this.downloadDlfunk = downloadDlfunk;
     this.mediaPlayer = mediaPlayer;
     //activity.setContentView(R.layout.activity_wahl); // Entfernt frühere Eintragungen
@@ -92,14 +92,14 @@ class DownloadXmlTask extends AsyncTask<String, String, Menge> {
     // als
     // new DownloadXmlTask(
     //      activity, context, this.debug,
-    //      seitennummer, downloadDlfunk, mediaPlayer
+    //      prefSeite, downloadDlfunk, mediaPlayer
     //  ).execute(suchbegriff);
     String ServerURL =
         "http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc";
     String suchbegriff = urls[0];
     String myUrlString = ServerURL
         + "?drau:" + suchbegriff;
-    // + "&drau:page=" + seitennummer;
+    // + "&drau:page=" + prefSeite;
     String seitennummerparameter = "&drau:page=";
     // Lade entries aus aus der Datei zum suchbegriff
     Menge menge = new Menge(activity, context, debug, mediaPlayer, suchbegriff);
@@ -116,9 +116,10 @@ class DownloadXmlTask extends AsyncTask<String, String, Menge> {
             + suchbegriff
     );
     if (menge.isEmpty()) {
+      int gewünschteSeite = 0;
       try {
         //xx menge = ladeXmlBeschreibungen(myUrlString, seitennummerparameter, true);
-        menge.addAll(ladeXmlBeschreibungen(myUrlString, seitennummerparameter, true));
+        menge.addAll(ladeXmlBeschreibungen(myUrlString, seitennummerparameter));
       } catch (IOException e) {
         //return new Sendungen(getResources().getString(R.string.connection_error));
       } catch (XmlPullParserException e) {
@@ -236,23 +237,37 @@ class DownloadXmlTask extends AsyncTask<String, String, Menge> {
    */
   private Menge ladeXmlBeschreibungen(
       String urlString,
-      String seitennummerparameter, boolean alleXmlseiten)
+      String seitennummerparameter)
       throws XmlPullParserException, IOException {
-    int seitennummer = 1;
-    InputStream stream = null;
+
+    SharedPreferences mySharedPrefs;
+    mySharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    String nummertext = mySharedPrefs.getString("seitennummerPref", "0");
+    int gewünschteSeite=0;
+    try {
+      gewünschteSeite = Integer.parseInt(nummertext);
+      if (debug > 8) Log.i("W013", "nummertext = " + nummertext);
+    } catch (NumberFormatException e) {
+      //Will Throw exception!
+      //do something! anything to handle the exception.
+      if (debug > 8) Log.i("WE13", nummertext + "!" + e.toString());
+    }
+
     DeutschlandradioXmlParser dlfunkXmlParser = new DeutschlandradioXmlParser(debug);
     Menge entries = null; // Liste aufgezeichneter Sendungen
     Menge einigeSendungen = null; // Liste einiger aufgezeichneter Sendungen
     Calendar rightNow = Calendar.getInstance();
     //DateFormat formatter = new SimpleDateFormat("MMM dd h:mmaa");
     DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
-    int letzteNummer = 0;
+    int letzteNummer = 1, lfdSeite = 1;
+    boolean alleSeiten = (gewünschteSeite==0);
+    if (!alleSeiten) letzteNummer = lfdSeite = gewünschteSeite;
     do {
       // Hole die Meta-Daten aufgezeichneter Sendungen aus dem Internet
-      String urlStringMitSeite = urlString + seitennummerparameter + seitennummer;
+      String urlStringMitSeite = urlString + seitennummerparameter + lfdSeite;
       // http://srv.deutschlandradio.de/aodlistaudio.1706.de.rpc?drau:searchterm=forschung+aktuell&drau:page=4
       if (debug>8) Log.i("X040", urlStringMitSeite);
-      stream = downloadUrl(urlStringMitSeite);
+      InputStream stream = downloadUrl(urlStringMitSeite);
       einigeSendungen = dlfunkXmlParser.parseEine(stream);
       if (entries == null) {
         entries = einigeSendungen;
@@ -260,21 +275,22 @@ class DownloadXmlTask extends AsyncTask<String, String, Menge> {
         entries.addAll(einigeSendungen);
       }
       if (stream != null) stream.close();
-      letzteNummer = entries.seitenanzahl;
+      if (alleSeiten)
+        letzteNummer = entries.seitenanzahl;
       publishProgress(  // die Parameter werden von onProgressUpdate verarbeitet
           String.format("%02d%% %02d von %02d %s XML-Ladefortschritt",
-              seitennummer * 100 / letzteNummer,
-              seitennummer,
+              lfdSeite * 100 / letzteNummer,
+              lfdSeite,
               letzteNummer,
               urlStringMitSeite)
       );
-      seitennummer++;
-    } while (alleXmlseiten && !entries.isEmpty() && seitennummer <= letzteNummer);
+      lfdSeite++;
+    } while ( !entries.isEmpty() && lfdSeite <= letzteNummer);
     if (debug>2)
       if (entries.isEmpty())
-        Log.i("X050", (alleXmlseiten ? "alle" : "eine") + " " + 0 + " Seiten");
+        Log.i("X050", ((gewünschteSeite==0) ? "alle" : "eine") + " " + 0 + " Seiten");
       else
-        Log.i("X051", (alleXmlseiten ? "alle" : "eine") + " " + entries.seitenanzahl + " Seiten");
+        Log.i("X051", ((gewünschteSeite==0) ? "alle" : "eine") + " " + entries.seitenanzahl + " Seiten");
     return entries;
   }
 

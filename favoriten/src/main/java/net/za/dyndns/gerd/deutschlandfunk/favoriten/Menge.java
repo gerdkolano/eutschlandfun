@@ -108,16 +108,23 @@ public class Menge {
       int zeile = 0;
       Entry entry = new Entry(debug);
       while ((strLine = br.readLine()) != null) {
-        entry.ladeNach(strLine, zeile);
-        // Print the content on the console
+        // Print the content on the logcat
         if (debug>8) Log.i("L" + String.format("%3d", zeile), strLine);
-        //System.out.println(strLine);
+        // Sammle die einzelnen Felder
+        if (entry.allesGesammelt(strLine, zeile)) {
+          this.add(entry);
+          seitenanzahl = entry.seitenanzahl;
+          entry = new Entry(debug);
+        }
         zeile++;
+/*
+        entry.ladeNach(strLine, zeile);
         if (zeile % Entry.siebenZeilen == 0) {
           this.add(entry);
           seitenanzahl = entry.seitenanzahl;
           entry = new Entry(debug);
         }
+*/
       }
       //Close the input stream
       fstream.close();
