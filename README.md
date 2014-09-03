@@ -1,5 +1,9 @@
 eutschlandfun Android
 =============
+TODO
+    Unterbreite ein Angebot zum Löschen der Audiodatei.
+    Wie kann ein unterbrochener Download fortgesetzt werden?
+
     Download favourites like "Forschung aktuell" or "Wissenschaft im Brennpunkt" and hear them
     Deutschlandfunk - Lade Favoriten wie "Forschung aktuell" oder "Wissenschaft im Brennpunkt" herunter und höre sie.
     
