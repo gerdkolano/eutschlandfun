@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-
-=======
 eutschlandfun Android
 =============
     Download favourites like "Forschung aktuell" or "Wissenschaft im Brennpunkt" and hear them
